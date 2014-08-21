@@ -53,12 +53,65 @@ addUrl = function (args) {
     }
 };
 
+fetchInstapaper = function () {
+  var request = new XMLHttpRequest();
+  request.open("GET", "https://www.instapaper.com/u", false);
+  request.send();
+  var parser = new DOMParser();
+  var dom = parser.parseFromString(request.responseText, "text/html");
+
+  return dom;
+};
+
+getTitleList = function (dom) {
+  var title_list = [];
+  var articles = dom.getElementsByClassName("article_item");
+  for each (var article in articles) {
+    if (Object.prototype.toString.call(article) == "[object HTMLElement]") {
+      var titles = article.getElementsByClassName("article_title");
+      var title = titles[0].getAttribute("title");
+      title_list.push(title);
+    }
+  }
+
+  return title_list;
+};
+
+getUrlList = function (dom) {
+  var url_list = [];
+  var articles = dom.getElementsByClassName("article_item");
+  for each (var article in articles) {
+    if (Object.prototype.toString.call(article) == "[object HTMLElement]") {
+      var titles = article.getElementsByClassName("js_domain_linkout");
+      var url = titles[0].getAttribute("href");
+      url_list.push(url);
+    }
+  }
+
+  return url_list;
+}
+
 commands.addUserCommand(["instapaper", "ip"], "instapaper",
   function action(args) {
   }, {
     subCommands: [
       new Command(["add"], "Description", addUrl, {}),
-      new Command(["list"], "Description", function (args) {}, {}),
+      new Command(["originalopen", "oo"], "open original page", function (args) {liberator.open(args, liberator.NEW_BACKGROUND_TAB);},
+        {
+          completer: function (context) {
+            var dom = fetchInstapaper();
+            var title_list = getTitleList(dom);
+            var url_list = getUrlList(dom);
+            var cs = []
+            for (i = 0; i < title_list.length; i++) {
+              cs.push([url_list[i], title_list[i]]);
+            }
+            context.compare = void 0;
+            context.title = ["url", "title"];
+            context.completions = cs;
+          }
+        }
+      ),
     ],
   },
   true
