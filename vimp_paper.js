@@ -96,7 +96,10 @@ commands.addUserCommand(["instapaper", "ip"], "instapaper",
   }, {
     subCommands: [
       new Command(["add"], "Description", addUrl, {}),
-      new Command(["originalopen", "oo"], "open original page", function (args) {liberator.open(args, liberator.NEW_BACKGROUND_TAB);},
+      new Command(["open"], "open page",
+        function (args) {
+          liberator.open(args, liberator.NEW_BACKGROUND_TAB);
+        },
         {
           completer: function (context) {
             var dom = fetchInstapaper();
