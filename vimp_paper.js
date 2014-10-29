@@ -91,6 +91,46 @@ getUrlList = function (dom) {
   return url_list;
 }
 
+getIdList = function (dom) {
+  var id_list = [];
+  var articles = dom.getElementsByClassName("article_item");
+  for each (var article in articles) {
+    if (Object.prototype.toString.call(article) == "[object HTMLElement]") {
+      var id = article.getAttribute("data-article-id");
+      id_list.push(id);
+    }
+  }
+
+  return id_list;
+}
+
+deleteId = function (id) {
+  var options = {
+      'url' : 'https://www.instapaper.com/delete_articles',
+      'method' : 'POST',
+  };
+  var params = {};
+  params[id] = null;
+  var request = new XMLHttpRequest();
+  request.open(options.method, options.url, false);
+  request.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' );
+  // request.send(EncodeHTMLForm(params));
+  request.send(JSON.stringify([id]));
+  if (request.status == "200") {
+      liberator.echo("This URL has been successfully deleted from this Instapaper account.");
+  } else {
+      liberator.echoerr("Unknown Error " + request.responseText);
+  }
+}
+
+function printProperties(obj) {
+    var properties = '';
+    for (var prop in obj){
+        properties += prop + "=" + obj[prop] + "\n";
+    }
+    alert(properties);
+}
+
 commands.addUserCommand(["instapaper", "ip"], "instapaper",
   function action(args) {
   }, {
@@ -111,6 +151,30 @@ commands.addUserCommand(["instapaper", "ip"], "instapaper",
             }
             context.compare = void 0;
             context.title = ["url", "title"];
+            context.completions = cs;
+          }
+        }
+      ),
+      new Command(["deleteandopen", "dao"], "open page and delete page from instapaper",
+        function (args) {
+          var args = args[0].split(",");
+          var url = args[0];
+          var id = args[1];
+          deleteId(id);
+          liberator.open(url, liberator.NEW_BACKGROUND_TAB);
+        },
+        {
+          completer: function (context) {
+            var dom = fetchInstapaper();
+            var title_list = getTitleList(dom);
+            var url_list = getUrlList(dom);
+            var id_list = getIdList(dom);
+            var cs = []
+            for (i = 0; i < title_list.length; i++) {
+              cs.push([url_list[i] + "," + id_list[i], title_list[i]]);
+            }
+            context.compare = void 0;
+            context.title = ["url, id", "title"];
             context.completions = cs;
           }
         }
