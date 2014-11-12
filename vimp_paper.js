@@ -40,16 +40,16 @@ addUrl = function (args) {
     request.open(options.method, options.url, false);
     request.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' );
     request.send(EncodeHTMLForm(params));
-    if (request.responseText == "201") {
+    if (request.status == "201") {
         liberator.echo("This URL has been successfully added to this Instapaper account.");
-    } else if (request.responseText == "400") {
+    } else if (request.status == "400") {
         liberator.echoerr("Bad request or exceeded the rate limit. Probably missing a required parameter, such as url.");
-    } else if (request.responseText == "403") {
+    } else if (request.status == "403") {
         liberator.echoerr("Invalid username or password.");
-    } else if (request.responseText == "500") {
+    } else if (request.status == "500") {
         liberator.echoerr("The service encountered an error. Please try again later.");
     } else {
-        liberator.echoerr("Unknown Error");
+        liberator.echoerr(request.responseText);
     }
 };
 
