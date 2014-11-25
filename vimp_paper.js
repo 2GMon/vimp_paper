@@ -123,6 +123,20 @@ deleteId = function (id) {
   }
 }
 
+deleteCompleter = function(context) {
+    var dom = fetchInstapaper();
+    var title_list = getTitleList(dom);
+    var url_list = getUrlList(dom);
+    var id_list = getIdList(dom);
+    var cs = []
+        for (i = 0; i < title_list.length; i++) {
+            cs.push([url_list[i] + "," + id_list[i], title_list[i]]);
+        }
+    context.compare = void 0;
+    context.title = ["url, id", "title"];
+    context.completions = cs;
+}
+
 function printProperties(obj) {
     var properties = '';
     for (var prop in obj){
@@ -155,6 +169,15 @@ commands.addUserCommand(["instapaper", "ip"], "instapaper",
           }
         }
       ),
+      new Command(["delete", "del"], "delete page from instapaper",
+        function (args) {
+          var args = args[0].split(",");
+          var url = args[0];
+          var id = args[1];
+          deleteId(id);
+        },
+        { completer: deleteCompleter }
+      ),
       new Command(["deleteandopen", "dao"], "open page and delete page from instapaper",
         function (args) {
           var args = args[0].split(",");
@@ -163,21 +186,7 @@ commands.addUserCommand(["instapaper", "ip"], "instapaper",
           deleteId(id);
           liberator.open(url, liberator.NEW_BACKGROUND_TAB);
         },
-        {
-          completer: function (context) {
-            var dom = fetchInstapaper();
-            var title_list = getTitleList(dom);
-            var url_list = getUrlList(dom);
-            var id_list = getIdList(dom);
-            var cs = []
-            for (i = 0; i < title_list.length; i++) {
-              cs.push([url_list[i] + "," + id_list[i], title_list[i]]);
-            }
-            context.compare = void 0;
-            context.title = ["url, id", "title"];
-            context.completions = cs;
-          }
-        }
+        { completer: deleteCompleter }
       ),
     ],
   },
