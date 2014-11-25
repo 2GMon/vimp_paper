@@ -123,6 +123,19 @@ deleteId = function (id) {
   }
 }
 
+openCompleter = function(context) {
+    var dom = fetchInstapaper();
+    var title_list = getTitleList(dom);
+    var url_list = getUrlList(dom);
+    var cs = [];
+    for (i = 0; i < title_list.length; i++) {
+        cs.push([url_list[i], title_list[i]]);
+    }
+    context.compare = void 0;
+    context.title = ["url", "title"];
+    context.completions = cs;
+}
+
 deleteCompleter = function(context) {
     var dom = fetchInstapaper();
     var title_list = getTitleList(dom);
@@ -154,20 +167,7 @@ commands.addUserCommand(["instapaper", "ip"], "instapaper",
         function (args) {
           liberator.open(args, liberator.NEW_BACKGROUND_TAB);
         },
-        {
-          completer: function (context) {
-            var dom = fetchInstapaper();
-            var title_list = getTitleList(dom);
-            var url_list = getUrlList(dom);
-            var cs = []
-            for (i = 0; i < title_list.length; i++) {
-              cs.push([url_list[i], title_list[i]]);
-            }
-            context.compare = void 0;
-            context.title = ["url", "title"];
-            context.completions = cs;
-          }
-        }
+        { completer: openCompleter }
       ),
       new Command(["delete", "del"], "delete page from instapaper",
         function (args) {
