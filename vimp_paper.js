@@ -128,10 +128,10 @@ deleteCompleter = function(context) {
     var title_list = getTitleList(dom);
     var url_list = getUrlList(dom);
     var id_list = getIdList(dom);
-    var cs = []
-        for (i = 0; i < title_list.length; i++) {
-            cs.push([url_list[i] + "," + id_list[i], title_list[i]]);
-        }
+    var cs = [];
+    for (i = 0; i < title_list.length; i++) {
+        cs.push([url_list[i] + "," + id_list[i], title_list[i]]);
+    }
     context.compare = void 0;
     context.title = ["url, id", "title"];
     context.completions = cs;
