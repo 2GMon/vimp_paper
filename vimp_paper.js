@@ -37,20 +37,25 @@ addUrl = function (args) {
         'url' : args
     }
     var request = new XMLHttpRequest();
-    request.open(options.method, options.url, false);
+    request.open(options.method, options.url, true);
     request.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' );
-    request.send(EncodeHTMLForm(params));
-    if (request.status == "201") {
-        liberator.echo("This URL has been successfully added to this Instapaper account.");
-    } else if (request.status == "400") {
-        liberator.echoerr("Bad request or exceeded the rate limit. Probably missing a required parameter, such as url.");
-    } else if (request.status == "403") {
-        liberator.echoerr("Invalid username or password.");
-    } else if (request.status == "500") {
-        liberator.echoerr("The service encountered an error. Please try again later.");
-    } else {
-        liberator.echoerr(request.responseText);
+    request.onload = function(e) {
+        if (request.status == "201") {
+            liberator.echo("This URL has been successfully added to this Instapaper account.");
+        } else if (request.status == "400") {
+            liberator.echoerr("Bad request or exceeded the rate limit. Probably missing a required parameter, such as url.");
+        } else if (request.status == "403") {
+            liberator.echoerr("Invalid username or password.");
+        } else if (request.status == "500") {
+            liberator.echoerr("The service encountered an error. Please try again later.");
+        } else {
+            liberator.echoerr(request.responseText);
+        }
     }
+    request.onerror = function(e) {
+        liberator.echoerr("Unknown Error.");
+    }
+    request.send(EncodeHTMLForm(params));
 };
 
 fetchInstapaper = function () {
@@ -112,15 +117,16 @@ deleteId = function (id) {
   var params = {};
   params[id] = null;
   var request = new XMLHttpRequest();
-  request.open(options.method, options.url, false);
+  request.open(options.method, options.url, true);
   request.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' );
-  // request.send(EncodeHTMLForm(params));
-  request.send(JSON.stringify([id]));
-  if (request.status == "200") {
-      liberator.echo("This URL has been successfully deleted from this Instapaper account.");
-  } else {
-      liberator.echoerr("Unknown Error " + request.responseText);
+  request.onload = function(e) {
+      if (request.status == "200") {
+          liberator.echo("This URL has been successfully deleted from this Instapaper account.");
+      } else {
+          liberator.echoerr("Unknown Error " + request.responseText);
+      }
   }
+  request.send(JSON.stringify([id]));
 }
 
 openCompleter = function(context) {
